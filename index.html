@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RajPeakPortal | Secure Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* =========================================================
+       Global Setup & Compulsory Background Image
+       ========================================================= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Compulsory Mountain Landscape Stock Image + Blue/Orange Gradient Overlay */
+      background: linear-gradient(to bottom, rgba(255, 200, 150, 0.2), rgba(30, 80, 140, 0.65)),
+                  url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
+      color: #ffffff;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+
+    .hidden { display: none !important; }
+
+    /* =========================================================
+       Glassmorphism Card Structure (Matching Reference Image)
+       ========================================================= */
+    .auth-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 380px;
+      /* Translucent blue glass panel exactly like the reference */
+      background: rgba(110, 140, 195, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 12px;
+      padding: 45px 35px 35px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      animation: fadeInCard 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeInCard {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Top Profile Avatar Icon */
+    .avatar-wrapper {
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .avatar-circle {
+      width: 70px;
+      height: 70px;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .avatar-circle svg {
+      width: 38px;
+      height: 38px;
+      stroke: #ffffff;
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    /* Headings */
+    .card-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 30px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Input Fields */
+    .input-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .input-field {
+      width: 100%;
+      height: 48px;
+      background: #f4f6f9;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333333;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .input-field::placeholder {
+      color: #8892b0;
+      font-weight: 400;
+    }
+
+    .input-field:focus {
+      border-color: #d4ed31;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(212, 237, 49, 0.2);
+    }
+
+    /* =========================================================
+       Isolated 3D Button Effect (Strict Rule)
+       ========================================================= */
+    .btn-3d-wrapper {
+      perspective: 1000px;
+      margin-top: 22px;
+      margin-bottom: 20px;
+    }
+
+    .btn-3d {
+      width: 100%;
+      height: 48px;
+      /* Soft yellow/lime accent matching reference image */
+      background: #d4ed31;
+      color: #1e293b;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(212, 237, 49, 0.3);
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background 0.2s;
+    }
+
+    .btn-3d:hover {
+      background: #c3dc1e;
+    }
+
+    /* Options (Remember me & Forgot Password) */
+    .options-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 25px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .remember-me input {
+      accent-color: #d4ed31;
+    }
+
+    .forgot-link {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+      color: #ffffff;
+    }
+
+    /* Footer Switcher */
+    .footer-switcher {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .footer-switcher a {
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    .footer-switcher a:hover {
+      text-decoration: underline;
+    }
+
+    /* Form Transition Wrapper */
+    .form-wrapper {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .form-wrapper.fade-out {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+
+    /* =========================================================
+       Dashboard View (Strictly Protected)
+       ========================================================= */
+    .dashboard-container {
+      width: 100%;
+      max-width: 850px;
+      background: rgba(30, 50, 80, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      padding: 45px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      z-index: 10;
+      animation: fadeInCard 0.5s ease-out;
+    }
+
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .dash-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .btn-logout {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-logout:hover { background: #ff6b81; }
+
+    .widget-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .widget {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 22px;
+      border-radius: 12px;
+      border-left: 4px solid #d4ed31;
+    }
+
+    .widget h3 { font-size: 16px; margin-bottom: 8px; color: #d4ed31; }
+    .widget p { font-size: 13px; color: rgba(255, 255, 255, 0.8); line-height: 1.5; }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 25px; right: 25px;
+      background: #1e293b;
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      transform: translateX(150%);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+    }
+    .toast.show { transform: translateX(0); }
+  </style>
+</head>
+<body>
+
+  <!-- Toast Message -->
+  <div id="toastAlert" class="toast">Status Message</div>
+
+  <!-- =========================================================
+       Authentication Container
+       ========================================================= -->
+  <div id="auth-view" class="auth-wrapper">
+    
+    <!-- Top Profile Avatar Icon -->
+    <div class="avatar-wrapper">
+      <div class="avatar-circle">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Form Content Wrapper -->
+    <div id="formContent" class="form-wrapper">
+      
+      <!-- LOGIN FORM -->
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <h2 class="card-title">Sign in</h2>
+
+        <div class="input-group">
+          <input type="text" id="loginUser" class="input-field" placeholder="Username" required autocomplete="off">
+        </div>
+
+        <div class="input-group">
+          <input type="password" id="loginPass" class="input-field" placeholder="Password" required>
+        </div>
+
+        <!-- 3D Interactive Button -->
+        <div class="btn-3d-wrapper">
+          <button type="submit" class="btn-3d" id="loginBtn">Login</button>
+        </div>
+
+        <div class="options-row">
+          <label class="remember-me">
+            <input type="checkbox" checked> Remember me
+          </label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <div class="footer-switcher">
+          <a onclick="toggleForm('signup')">Create Account</a>
+        </div>
+      </form>
+
+      <!-- SIGN UP FORM (Hidden Default - Strict Requirement) -->
+      <form id="signupForm" class="hidden" onsubmit="handleSignup(event)">
+        <h2 class="card-title">Create Account</h2>
+
+        <div class="input-group">
+          <input type="text" id="signupUser" class="input-field" placeholder="Choose Username" required autocomplete="off">
+        </div>
+
+        <div class="input-group">
+          <input type="password" id="signupPass" class="input-field" placeholder="Create Password" required>
+        </div>
+
+        <!-- 3D Interactive Button -->
+        <div class="btn-3d-wrapper">
+          <button type="submit" class="btn-3d" id="signupBtn">Register</button>
+        </div>
+
+        <div class="footer-switcher">
+          Already have an account? <a onclick="toggleForm('login')">Sign in</a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       Dashboard View (Strictly Protected Route)
+       ========================================================= -->
+  <div id="dashboard-view" class="dashboard-container hidden">
+    <div class="dash-header">
+      <h1 id="welcomeText">Welcome, Raj!</h1>
+      <button class="btn-logout" onclick="processLogout()">Sign Out</button>
+    </div>
+    
+    <div class="widget-grid">
+      <div class="widget">
+        <h3>Secure Summit Auth</h3>
+        <p>Your session has been validated securely through local storage authentication protocols.</p>
+      </div>
+      <div class="widget">
+        <h3>Mountain Landscape View</h3>
+        <p>The compulsory background image is active behind this glassmorphic summit container.</p>
+      </div>
+      <div class="widget">
+        <h3>RajPeakPortal Access</h3>
+        <p>All system modules and network capabilities are fully unlocked for your session.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       JavaScript Logic (Auth & 3D Button Physics)
+       ========================================================= -->
+  <script>
+    // Initialize Session & 3D Buttons
+    window.onload = () => {
+      const session = sessionStorage.getItem('rajpeak_user');
+      if (session) {
+        showDashboard(JSON.parse(session).username);
+      }
+      init3DButtons();
+    };
+
+    // Isolated 3D Tilt Effect strictly for buttons
+    function init3DButtons() {
+      const buttons = document.querySelectorAll('.btn-3d');
+      buttons.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          
+          const rotateX = ((y - centerY) / centerY) * -12; 
+          const rotateY = ((x - centerX) / centerX) * 12;
+
+          btn.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03) translateZ(8px)`;
+          btn.style.boxShadow = `${-rotateY}px ${rotateX + 10}px 22px rgba(212, 237, 49, 0.4)`;
+        });
+
+        btn.addEventListener('mouseleave', () => {
+          btn.style.transform = `rotateX(0deg) rotateY(0deg) scale(1) translateZ(0)`;
+          btn.style.boxShadow = `0 8px 20px rgba(212, 237, 49, 0.3)`;
+        });
+      });
+    }
+
+    // Smooth Form Switcher
+    function toggleForm(type) {
+      const content = document.getElementById('formContent');
+      const login = document.getElementById('loginForm');
+      const signup = document.getElementById('signupForm');
+      
+      content.classList.add('fade-out');
+      
+      setTimeout(() => {
+        if (type === 'signup') {
+          login.classList.add('hidden');
+          signup.classList.remove('hidden');
+        } else {
+          signup.classList.add('hidden');
+          login.classList.remove('hidden');
+        }
+        content.classList.remove('fade-out');
+      }, 300);
+    }
+
+    // Handle Registration
+    function handleSignup(e) {
+      e.preventDefault();
+      const user = document.getElementById('signupUser').value.trim();
+      const pass = document.getElementById('signupPass').value.trim();
+
+      let db = JSON.parse(localStorage.getItem('rajpeak_db')) || [];
+
+      if (db.find(u => u.username === user)) {
+        displayToast("Username already exists!");
+        return;
+      }
+
+      db.push({ username: user, password: pass });
+      localStorage.setItem('rajpeak_db', JSON.stringify(db));
+
+      displayToast("Account Created! Please Sign In.");
+      e.target.reset();
+      toggleForm('login');
+      document.getElementById('loginUser').value = user;
+    }
+
+    // Handle Login
+    function handleLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value.trim();
+
+      let db = JSON.parse(localStorage.getItem('rajpeak_db')) || [];
+      const validUser = db.find(u => u.username === user && u.password === pass);
+
+      if (validUser) {
+        sessionStorage.setItem('rajpeak_user', JSON.stringify(validUser));
+        displayToast("Sign in Successful!");
+        showDashboard(validUser.username);
+      } else {
+        displayToast("Invalid Username or Password!");
+      }
+    }
+
+    // Show Protected Dashboard
+    function showDashboard(username) {
+      document.getElementById('auth-view').classList.add('hidden');
+      document.getElementById('dashboard-view').classList.remove('hidden');
+      document.getElementById('welcomeText').innerText = `Welcome to RajPeakPortal, ${username}!`;
+    }
+
+    // Process Logout
+    function processLogout() {
+      sessionStorage.removeItem('rajpeak_user');
+      document.getElementById('dashboard-view').classList.add('hidden');
+      document.getElementById('auth-view').classList.remove('hidden');
+      document.getElementById('loginPass').value = '';
+      displayToast("Securely signed out.");
+    }
+
+    // Toast Notification System
+    function displayToast(msg) {
+      const toast = document.getElementById('toastAlert');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
+  </script>
+</body>
+</html>
